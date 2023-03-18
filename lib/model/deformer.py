@@ -159,7 +159,7 @@ class ForwardDeformer(torch.nn.Module):
         xd = skinning(xc, w, tfs, inverse=False)
         return xd
 
-    def query_velocity(self, xd, cond, tfs, tfs_last, eval_mode=True):
+    def query_velocity(self, xd, max_idx, cond, tfs, tfs_last, eval_mode=True):
         """
         Query the velocity of the given points in the observation space.
 
@@ -176,10 +176,10 @@ class ForwardDeformer(torch.nn.Module):
         """
         with torch.enable_grad():
             xc, _ = self.forward(xd, cond, tfs, eval_mode=eval_mode)        # B x N x I x D, I is number of init
-        print(xc)
-        print(xc.shape)
+            xc = xc[max_idx[..., None]]                                     # B x N x D
+            print(xc.shape)
         xd_last = self.forward_skinning(xc, cond, tfs_last)
-        print(xc, xd_last)
+        exit()
 
     def query_weights(self, xc, cond, mask=None):
         """Get skinning weights in canonical space

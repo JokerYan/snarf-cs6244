@@ -57,10 +57,6 @@ class SNARFModel(pl.LightningModule):
 
             # compute canonical correspondences
             pts_c, intermediates = self.deformer(pts_d_split, cond, smpl_tfs, eval_mode=eval_mode)
-            print(pts_c.shape)
-
-            # # test velocity
-            # self.deformer.query_velocity(pts_d_split, cond, smpl_tfs, smpl_tfs, eval_mode=eval_mode)
 
             # query occuancy in canonical space
             num_batch, num_point, num_init, num_dim = pts_c.shape
@@ -72,8 +68,9 @@ class SNARFModel(pl.LightningModule):
             if eval_mode:
                 # occ_pd = masked_softmax(occ_pd, mask, dim=-1, mode='max')
                 occ_pd, max_idx = masked_softmax_with_idx(occ_pd, mask, dim=-1, mode='max')
-                print(max_idx.shape)
-                exit()
+
+                # # test velocity
+                self.deformer.query_velocity(pts_d_split, max_idx, cond, smpl_tfs, smpl_tfs, eval_mode=eval_mode)
             else:
                 occ_pd = masked_softmax(occ_pd, mask, dim=-1, mode='softmax', soft_blend=self.opt.soft_blend)
 
