@@ -215,7 +215,7 @@ class ForwardDeformer(torch.nn.Module):
         xc.requires_grad_(True)
 
         xd = self.forward_skinning(xc, cond, tfs)
-        print(xc.requires_grad, xd.requires_grad)
+        xd.requires_grad_(True)
 
         grads = []
         for i in range(xd.shape[-1]):
