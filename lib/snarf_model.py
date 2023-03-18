@@ -11,7 +11,7 @@ from lib.model.sample import PointOnBones
 from lib.model.network import ImplicitNetwork
 from lib.model.metrics import calculate_iou
 from lib.utils.meshing import generate_mesh
-from lib.model.helpers import masked_softmax
+from lib.model.helpers import masked_softmax, masked_softmax_with_idx
 from lib.model.deformer import ForwardDeformer, skinning
 from lib.utils.render import render_trimesh, render_joint, weights2colors
 
@@ -70,9 +70,9 @@ class SNARFModel(pl.LightningModule):
             # aggregate occupancy probablities
             mask = intermediates['valid_ids']
             if eval_mode:
-                print(occ_pd.shape)
-                occ_pd = masked_softmax(occ_pd, mask, dim=-1, mode='max')
-                print(occ_pd.shape)
+                # occ_pd = masked_softmax(occ_pd, mask, dim=-1, mode='max')
+                occ_pd, max_idx = masked_softmax_with_idx(occ_pd, mask, dim=-1, mode='max')
+                print(max_idx.shape)
                 exit()
             else:
                 occ_pd = masked_softmax(occ_pd, mask, dim=-1, mode='softmax', soft_blend=self.opt.soft_blend)

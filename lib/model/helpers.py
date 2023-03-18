@@ -24,6 +24,14 @@ def masked_softmax(vec, mask, dim=-1, mode='softmax', soft_blend=1):
 
     return output
 
+def masked_softmax_with_idx(vec, mask, dim=-1, mode='softmax', soft_blend=1):
+    if mode == 'softmax':
+        raise NotImplementedError
+    elif mode == 'max':
+        vec[~mask] = -math.inf
+        output, idx = torch.max(vec,dim, keepdim=True)
+        return output, idx
+
 
 ''' Hierarchical softmax following the kinematic tree of the human body. Imporves convergence speed'''
 def hierarchical_softmax(x):
