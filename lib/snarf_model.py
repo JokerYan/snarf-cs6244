@@ -59,7 +59,7 @@ class SNARFModel(pl.LightningModule):
             pts_c, intermediates = self.deformer(pts_d_split, cond, smpl_tfs, eval_mode=eval_mode)
 
             # test velocity
-            # self.deformer.query_velocity(pts_d_split, cond, smpl_tfs, smpl_tfs)
+            self.deformer.query_velocity(pts_d_split, cond, smpl_tfs, smpl_tfs, eval_mode=eval_mode)
 
             # query occuancy in canonical space
             num_batch, num_point, num_init, num_dim = pts_c.shape
