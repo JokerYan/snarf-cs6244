@@ -41,6 +41,7 @@ class ForwardDeformer(torch.nn.Module):
             others (dict): other useful outputs.
         """
         xc_init = self.init(xd, tfs)
+        print(xd.requires_grad, xc_init.requires_grad)
 
         xc_opt, others = self.search(xd, xc_init, cond, tfs, eval_mode=eval_mode)
 
