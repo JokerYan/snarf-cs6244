@@ -166,6 +166,7 @@ class ForwardDeformer(torch.nn.Module):
         Parameters
         ----------
         xd: observation space points
+        max_idx: B x N x 1, which init to choose
         cond: conditional input
         tfs: bone_transformation matrices
         tfs_last: bone_transformation matrices in the last frame
@@ -176,7 +177,7 @@ class ForwardDeformer(torch.nn.Module):
         """
         with torch.enable_grad():
             xc, _ = self.forward(xd, cond, tfs, eval_mode=eval_mode)        # B x N x I x D, I is number of init
-            xc = xc[max_idx[..., None]]                                     # B x N x D
+            xc = torch.gather(xc, dim=2, index=max_idx)                     # B x N x D
             print(xc.shape)
         xd_last = self.forward_skinning(xc, cond, tfs_last)
         exit()
