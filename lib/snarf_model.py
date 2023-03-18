@@ -57,6 +57,7 @@ class SNARFModel(pl.LightningModule):
 
             # compute canonical correspondences
             pts_c, intermediates = self.deformer(pts_d_split, cond, smpl_tfs, eval_mode=eval_mode)
+            print(pts_c.shape)
 
             # # test velocity
             # self.deformer.query_velocity(pts_d_split, cond, smpl_tfs, smpl_tfs, eval_mode=eval_mode)
