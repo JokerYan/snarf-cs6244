@@ -58,8 +58,8 @@ class SNARFModel(pl.LightningModule):
             # compute canonical correspondences
             pts_c, intermediates = self.deformer(pts_d_split, cond, smpl_tfs, eval_mode=eval_mode)
 
-            # test velocity
-            self.deformer.query_velocity(pts_d_split, cond, smpl_tfs, smpl_tfs, eval_mode=eval_mode)
+            # # test velocity
+            # self.deformer.query_velocity(pts_d_split, cond, smpl_tfs, smpl_tfs, eval_mode=eval_mode)
 
             # query occuancy in canonical space
             num_batch, num_point, num_init, num_dim = pts_c.shape
@@ -69,7 +69,10 @@ class SNARFModel(pl.LightningModule):
             # aggregate occupancy probablities
             mask = intermediates['valid_ids']
             if eval_mode:
+                print(occ_pd.shape)
                 occ_pd = masked_softmax(occ_pd, mask, dim=-1, mode='max')
+                print(occ_pd.shape)
+                exit()
             else:
                 occ_pd = masked_softmax(occ_pd, mask, dim=-1, mode='softmax', soft_blend=self.opt.soft_blend)
 
