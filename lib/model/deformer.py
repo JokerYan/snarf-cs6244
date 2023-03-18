@@ -178,7 +178,9 @@ class ForwardDeformer(torch.nn.Module):
         with torch.enable_grad():
             xc, _ = self.forward(xd, cond, tfs, eval_mode=eval_mode)        # B x N x I x D, I is number of init
             print("xc shape", xc.shape)
-            xc = torch.gather(xc, dim=2, index=max_idx[..., None])          # B x N x 1 x D
+            D = xc.shape[-1]
+            max_idx = torch.tile(max_idx[..., None], [1, 1, 1, D])          # B x N x 1 x D
+            xc = torch.gather(xc, dim=2, index=max_idx)                     # B x N x 1 x D
             print("xc shape", xc.shape)
         xd_last = self.forward_skinning(xc, cond, tfs_last)
         exit()
