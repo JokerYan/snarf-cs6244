@@ -159,6 +159,7 @@ class ForwardDeformer(torch.nn.Module):
         xd = skinning(xc, w, tfs, inverse=False)
         return xd
 
+    @torch.no_grad()
     def query_velocity(self, xd, cond, tfs, tfs_last, mask=None):
         """
         Query the velocity of the given points in the observation space.
@@ -174,7 +175,7 @@ class ForwardDeformer(torch.nn.Module):
         -------
 
         """
-        xc = self.forward(xd, cond, tfs)
+        xc, _ = self.forward(xd, cond, tfs)
         xd_last = self.forward_skinning(xc, cond, tfs_last, mask=mask)
         print(xc, xd_last)
 
