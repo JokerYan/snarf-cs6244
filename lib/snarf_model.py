@@ -223,8 +223,6 @@ class SNARFModel(pl.LightningModule):
         vertices = torch.Tensor(mesh.vertices).cuda()[None, ...]        # 1 x N x 3
         with torch.no_grad():
             occ, velocity = self.forward(vertices, smpl_tfs, smpl_tfs_last, smpl_thetas, eval_mode=True)
-        print(velocity)
-        print(velocity.shape)
 
         if fast_mode:
             verts  = torch.tensor(mesh.vertices).type_as(smpl_verts)
@@ -243,5 +241,7 @@ class SNARFModel(pl.LightningModule):
         # change mesh color to velocity
         velocity_color = (velocity - torch.min(velocity)) / (torch.max(velocity) - torch.min(velocity)) * 255
         mesh.visual.vertex_colors = velocity_color.cpu().numpy()
+        print(mesh.visual.vertex_colors)
+        print(velocity_color.cpu().numpy())
 
         return mesh
