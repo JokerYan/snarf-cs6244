@@ -165,6 +165,7 @@ class SNARFModel(pl.LightningModule):
         return self.validation_epoch_end(test_step_outputs)
 
     def plot(self, data, res=128, verbose=True, fast_mode=False):
+        fast_mode = False   # overwrite
 
         res_up = np.log2(res//32)
 
@@ -208,7 +209,6 @@ class SNARFModel(pl.LightningModule):
         This is faster as it bypasses root finding.
         However, it's not deforming the continuous field, but the discrete mesh.
         '''
-        print(fast_mode)
         if canonical or fast_mode:
             occ_func = lambda x: self.network(x, {'smpl': smpl_thetas[:,3:]/np.pi}).reshape(-1, 1)
         else:
