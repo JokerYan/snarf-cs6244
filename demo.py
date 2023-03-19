@@ -70,8 +70,11 @@ def main(opt):
     for i in trange(smpl_params_all.shape[0]):
 
         smpl_params = smpl_params_all[[i]]
+        smpl_params_last = smpl_params_all[[max(i - 1, 0)]]
         data = model.smpl_server.forward(smpl_params, absolute=True)
+        data_last = model.smpl_server.forward(smpl_params_last, absolute=True)
         data['smpl_thetas'] = smpl_params[:, 4:76]
+        data['smpl_tfs_last'] = data_last['smpl_tfs']
         results = model.plot(data, res=opt.demo.resolution, verbose=opt.demo.verbose, fast_mode=opt.demo.fast_mode)
 
         images.append(results['img_all'])
