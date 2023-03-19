@@ -49,8 +49,7 @@ class SNARFModel(pl.LightningModule):
 
         cond = {'smpl': smpl_thetas[:,3:]/np.pi}
         
-        # batch_points = 60000
-        batch_points = 30000
+        batch_points = 60000
 
         accum_pred = []
         velocity_list = []
@@ -222,7 +221,8 @@ class SNARFModel(pl.LightningModule):
 
         # query velocity
         vertices = torch.Tensor(mesh.vertices).cuda()[None, ...]        # 1 x N x 3
-        occ, velocity = self.forward(vertices, smpl_tfs, smpl_tfs_last, smpl_thetas, eval_mode=True)
+        with torch.no_grad():
+            occ, velocity = self.forward(vertices, smpl_tfs, smpl_tfs_last, smpl_thetas, eval_mode=True)
         print(velocity.shape, vertices.shape)
 
         if fast_mode:
