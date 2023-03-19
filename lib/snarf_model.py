@@ -240,8 +240,12 @@ class SNARFModel(pl.LightningModule):
             mesh.visual.vertex_colors = weights2colors(weights.data.cpu().numpy())
 
         # change mesh color to velocity
-        print(torch.min(velocity), torch.max(velocity))
-        velocity_color = (velocity - torch.min(velocity)) / (torch.max(velocity) - torch.min(velocity)) * 255
+        max_vel = 1
+
+        # velocity_color = (velocity - torch.min(velocity)) / (torch.max(velocity) - torch.min(velocity))
+        velocity_color = torch.clip(torch.abs(velocity), max=max_vel)
+
+        velocity_color = velocity_color * 255
         velocity_color = velocity_color.cpu().numpy()
         velocity_color = velocity_color.squeeze()
         velocity_color = np.concatenate([velocity_color, np.ones([velocity_color.shape[0], 1]) * 255], axis=1)
