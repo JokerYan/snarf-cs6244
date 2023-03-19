@@ -208,6 +208,7 @@ class SNARFModel(pl.LightningModule):
         This is faster as it bypasses root finding.
         However, it's not deforming the continuous field, but the discrete mesh.
         '''
+        print(fast_mode)
         if canonical or fast_mode:
             occ_func = lambda x: self.network(x, {'smpl': smpl_thetas[:,3:]/np.pi}).reshape(-1, 1)
         else:
