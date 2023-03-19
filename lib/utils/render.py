@@ -95,8 +95,6 @@ def render(verts, faces, colors=None):
 def render_trimesh(mesh, mode='npta'):
     verts = torch.tensor(mesh.vertices).cuda().float()[None]
     faces = torch.tensor(mesh.faces).cuda()[None]
-    print(mesh.visual.vertex_colors)
-    print(mesh.visual.vertex_colors.shape)
     colors = torch.tensor(mesh.visual.vertex_colors).float().cuda()[None,...,:3]/255
     image = renderer.render_mesh(verts, faces, colors=colors, mode=mode)[0]
     image = (255*image).data.cpu().numpy().astype(np.uint8)
