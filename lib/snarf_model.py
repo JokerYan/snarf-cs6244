@@ -43,7 +43,6 @@ class SNARFModel(pl.LightningModule):
         return optimizer
 
     def forward(self, pts_d, smpl_tfs, smpl_tfs_last, smpl_thetas, eval_mode=True):
-
         # rectify rest pose 
         smpl_tfs = torch.einsum('bnij,njk->bnik', smpl_tfs, self.smpl_server.tfs_c_inv)
 
@@ -71,7 +70,6 @@ class SNARFModel(pl.LightningModule):
                 occ_pd, max_idx = masked_softmax_with_idx(occ_pd, mask, dim=-1, mode='max')
 
                 # test velocity
-                print(pts_d_split.shape)
                 velocity = self.deformer.query_velocity(pts_d_split, max_idx, cond, smpl_tfs, smpl_tfs_last, eval_mode=eval_mode)
                 velocity_list.append(velocity)
             else:
@@ -82,11 +80,7 @@ class SNARFModel(pl.LightningModule):
         accum_pred = torch.cat(accum_pred, 1)
         velocity = torch.cat(velocity_list, 1)
 
-        return accum_pred
-
-    def query_velocity(self, pts_d, smpl_tfs, smpl_tfs_last, smpl_thetas):
-        print('vel', pts_d.shape)
-        # velocity = self.deformer.query_velocity(pts_d, max_idx, cond, smpl_tfs, smpl_tfs_last, eval_mode=eval_mode)
+        return accum_pred, velocity
 
     def training_step(self, data, data_idx):
 
@@ -172,7 +166,8 @@ class SNARFModel(pl.LightningModule):
         return self.validation_epoch_end(test_step_outputs)
 
     def plot(self, data, res=128, verbose=True, fast_mode=False):
-        fast_mode = False
+        fast_mode = False       # override
+
         res_up = np.log2(res//32)
 
         if verbose:
@@ -218,14 +213,15 @@ class SNARFModel(pl.LightningModule):
         if canonical or fast_mode:
             occ_func = lambda x: self.network(x, {'smpl': smpl_thetas[:,3:]/np.pi}).reshape(-1, 1)
         else:
-            occ_func = lambda x: self.forward(x, smpl_tfs, smpl_tfs_last, smpl_thetas, eval_mode=True).reshape(-1, 1)
-            # occ_func = lambda x: self.forward(x, smpl_tfs, smpl_tfs_last, smpl_thetas, eval_mode=True)
+            # occ_func = lambda x: self.forward(x, smpl_tfs, smpl_tfs_last, smpl_thetas, eval_mode=True).reshape(-1, 1)
+            occ_func = lambda x: self.forward(x, smpl_tfs, smpl_tfs_last, smpl_thetas, eval_mode=True)[0].reshape(-1, 1)
 
         mesh = generate_mesh(occ_func, smpl_verts.squeeze(0),res_up=res_up)
 
         # query velocity
-        vertices = torch.from_numpy(mesh.vertices).cuda()
-        self.query_velocity(vertices, smpl_tfs, smpl_tfs_last, smpl_thetas)
+        vertices = torch.from_numpy(mesh.vertices).cuda()[None, ...]        # 1 x N x 3
+        occ, velocity = self.forward(vertices, smpl_tfs, smpl_tfs_last, smpl_thetas, eval_mode=True)
+        print(velocity.shape, vertices.shape)
 
         if fast_mode:
             verts  = torch.tensor(mesh.vertices).type_as(smpl_verts)
