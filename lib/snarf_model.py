@@ -43,9 +43,10 @@ class SNARFModel(pl.LightningModule):
         return optimizer
 
     def forward(self, pts_d, smpl_tfs, smpl_tfs_last, smpl_thetas, eval_mode=True):
-        print(pts_d.shape)
+        print(smpl_tfs.shape)
         # rectify rest pose 
         smpl_tfs = torch.einsum('bnij,njk->bnik', smpl_tfs, self.smpl_server.tfs_c_inv)
+        smpl_tfs_last = torch.einsum('bnij,njk->bnik', smpl_tfs_last, self.smpl_server.tfs_c_inv)
 
         cond = {'smpl': smpl_thetas[:,3:]/np.pi}
         
