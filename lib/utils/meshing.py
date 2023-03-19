@@ -28,8 +28,12 @@ def generate_mesh(func, verts, level_set=0, res_init=32, res_up=3):
             points = torch.tensor(points).float().cuda()
 
             values, velocity = func(points.unsqueeze(0))
+
+            values = values.reshape([-1, 1])
+            velocity = velocity.reshape([-1, 1])
             values = values[:, 0]
             print(values.shape, velocity.shape)
+
             values = values.data.cpu().numpy().astype(np.float64)
 
             mesh_extractor.update(orig_points, values)

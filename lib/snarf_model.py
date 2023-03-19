@@ -214,7 +214,8 @@ class SNARFModel(pl.LightningModule):
         if canonical or fast_mode:
             occ_func = lambda x: self.network(x, {'smpl': smpl_thetas[:,3:]/np.pi}).reshape(-1, 1)
         else:
-            occ_func = lambda x: self.forward(x, smpl_tfs, smpl_tfs_last, smpl_thetas, eval_mode=True).reshape(-1, 1)
+            # occ_func = lambda x: self.forward(x, smpl_tfs, smpl_tfs_last, smpl_thetas, eval_mode=True).reshape(-1, 1)
+            occ_func = lambda x: self.forward(x, smpl_tfs, smpl_tfs_last, smpl_thetas, eval_mode=True)
 
         mesh = generate_mesh(occ_func, smpl_verts.squeeze(0),res_up=res_up)
 
