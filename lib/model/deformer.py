@@ -82,7 +82,6 @@ class ForwardDeformer(torch.nn.Module):
         Returns:
             xc_init (tensor): gradients. shape: [B, N, I, D]
         """
-        print(xd.dtype, tfs.dtype)
         n_batch, n_point, _ = xd.shape
         _, n_joint, _, _ = tfs.shape
 
