@@ -172,6 +172,7 @@ class SNARFModel(pl.LightningModule):
         return self.validation_epoch_end(test_step_outputs)
 
     def plot(self, data, res=128, verbose=True, fast_mode=False):
+        fast_mode = False
         res_up = np.log2(res//32)
 
         if verbose:
