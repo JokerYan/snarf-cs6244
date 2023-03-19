@@ -19,7 +19,10 @@ def generate_mesh(func, verts, level_set=0, res_init=32, res_up=3):
     
     # query occupancy grid
     with torch.no_grad():
+        loop_count = 0
         while points.shape[0] != 0:
+            loop_count += 1
+            print(loop_count)
             
             orig_points = points
             points = points.astype(np.float32)
@@ -30,9 +33,8 @@ def generate_mesh(func, verts, level_set=0, res_init=32, res_up=3):
             values, velocity = func(points.unsqueeze(0))
 
             values = values.reshape([-1, 1])
-            velocity = velocity.reshape([-1, 1])
+            velocity = velocity.reshape([-1, 3])
             values = values[:, 0]
-            print(values.shape, velocity.shape)
 
             values = values.data.cpu().numpy().astype(np.float64)
 
@@ -41,6 +43,7 @@ def generate_mesh(func, verts, level_set=0, res_init=32, res_up=3):
             points = mesh_extractor.query()
     
     value_grid = mesh_extractor.to_dense()
+    print(value_grid.shape)
     # value_grid = np.pad(value_grid, 1, "constant", constant_values=-1e6)
 
     # marching cube
