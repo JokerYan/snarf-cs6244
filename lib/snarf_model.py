@@ -81,7 +81,7 @@ class SNARFModel(pl.LightningModule):
         accum_pred = torch.cat(accum_pred, 1)
         velocity = torch.cat(velocity_list, 1)
 
-        return accum_pred, velocity
+        return accum_pred
 
     def training_step(self, data, data_idx):
 
@@ -214,11 +214,13 @@ class SNARFModel(pl.LightningModule):
         if canonical or fast_mode:
             occ_func = lambda x: self.network(x, {'smpl': smpl_thetas[:,3:]/np.pi}).reshape(-1, 1)
         else:
-            # occ_func = lambda x: self.forward(x, smpl_tfs, smpl_tfs_last, smpl_thetas, eval_mode=True).reshape(-1, 1)
-            occ_func = lambda x: self.forward(x, smpl_tfs, smpl_tfs_last, smpl_thetas, eval_mode=True)
+            occ_func = lambda x: self.forward(x, smpl_tfs, smpl_tfs_last, smpl_thetas, eval_mode=True).reshape(-1, 1)
+            # occ_func = lambda x: self.forward(x, smpl_tfs, smpl_tfs_last, smpl_thetas, eval_mode=True)
 
         mesh = generate_mesh(occ_func, smpl_verts.squeeze(0),res_up=res_up)
 
+        # query velocity
+        print(mesh.vertices.shape)
 
         if fast_mode:
             verts  = torch.tensor(mesh.vertices).type_as(smpl_verts)
