@@ -182,9 +182,8 @@ class ForwardDeformer(torch.nn.Module):
             xc = torch.gather(xc, dim=2, index=max_idx)                     # B x N x 1 x D
             xc = torch.squeeze(xc, dim=2)                                   # B x N x D
         xd_last = self.forward_skinning(xc, cond, tfs_last)
-        print(xd, xd_last)
-        print(xd.shape, xd_last.shape)
-        exit()
+        velocity = xd - xd_last
+        return velocity
 
     def query_weights(self, xc, cond, mask=None):
         """Get skinning weights in canonical space
