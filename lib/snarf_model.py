@@ -196,7 +196,8 @@ class SNARFModel(pl.LightningModule):
             surf_pred_def = self.extract_mesh(smpl_verts, data['smpl_tfs'][[0]], data['smpl_tfs_last'][[0]],
                                               data['smpl_thetas'][[0]], res_up=res_up, canonical=False, with_weights=False, fast_mode=fast_mode)
                         
-            img_pred_def  = render_trimesh(surf_pred_def, mode='p')
+            # img_pred_def  = render_trimesh(surf_pred_def, mode='p')
+            img_pred_def  = render_trimesh(surf_pred_def, mode='t')
             results = {
                 'img_all': img_pred_def,
                 'mesh_def' : surf_pred_def
@@ -245,7 +246,5 @@ class SNARFModel(pl.LightningModule):
         velocity_color = np.concatenate([velocity_color, np.ones([velocity_color.shape[0], 1]) * 255], axis=1)
         velocity_color = velocity_color.round().astype(np.uint8)
         mesh.visual.vertex_colors = velocity_color
-        print(mesh.visual.vertex_colors)
-        print(velocity_color)
 
         return mesh
