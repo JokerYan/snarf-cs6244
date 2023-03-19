@@ -244,7 +244,7 @@ class SNARFModel(pl.LightningModule):
         max_vel = 0.1
 
         # velocity_color = (velocity - torch.min(velocity)) / (torch.max(velocity) - torch.min(velocity))
-        velocity_color = torch.clip(torch.abs(velocity), max=max_vel)
+        velocity_color = torch.clip(torch.abs(velocity), max=max_vel) / max_vel
 
         velocity_color = velocity_color * 255
         velocity_color = velocity_color.cpu().numpy()
