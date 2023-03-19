@@ -51,6 +51,9 @@ class DFaustDataset(Dataset):
 
         data['smpl_verts'] = torch.tensor(dataset['vertices'])
         data['smpl_tfs'] = torch.tensor(dataset['bone_transforms']).inverse()
+        data['smpl_tfs_last'] = []
+        print(data['smpl_tfs'].shape)
+        exit()
         data['smpl_jnts'] = torch.tensor(dataset['joints'])
         data['smpl_thetas'] = torch.tensor(dataset['pose'])
         data['smpl_betas'] = self.betas
