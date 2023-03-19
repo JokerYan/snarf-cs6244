@@ -167,7 +167,7 @@ class SNARFModel(pl.LightningModule):
         return self.validation_epoch_end(test_step_outputs)
 
     def plot(self, data, res=128, verbose=True, fast_mode=False):
-        fast_mode = False       # override
+        # fast_mode = False       # override
 
         res_up = np.log2(res//32)
 
@@ -223,7 +223,6 @@ class SNARFModel(pl.LightningModule):
         vertices = torch.Tensor(mesh.vertices).cuda()[None, ...]        # 1 x N x 3
         with torch.no_grad():
             occ, velocity = self.forward(vertices, smpl_tfs, smpl_tfs_last, smpl_thetas, eval_mode=True)
-        print(velocity.shape, vertices.shape)
 
         if fast_mode:
             verts  = torch.tensor(mesh.vertices).type_as(smpl_verts)
