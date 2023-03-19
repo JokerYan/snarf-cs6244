@@ -238,4 +238,9 @@ class SNARFModel(pl.LightningModule):
             weights = self.deformer.query_weights(verts[None], None).clamp(0,1)[0]
             mesh.visual.vertex_colors = weights2colors(weights.data.cpu().numpy())
 
+        # change mesh color to velocity
+        print(torch.max(mesh.visual.vertex_colors))
+        velocity_color = (velocity - torch.min(velocity)) / (torch.max(velocity) - torch.min(velocity))
+        mesh.visual_vertex_colors = velocity_color
+
         return mesh

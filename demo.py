@@ -67,7 +67,7 @@ def main(opt):
     smpl_params_all = smpl_params_all[::opt.demo.every_n_frames]
     # generate data batch
     images = []
-    for i in trange(smpl_params_all.shape[0]):
+    for i in trange(min(smpl_params_all.shape[0], 10)):
 
         smpl_params = smpl_params_all[[i]]
         smpl_params_last = smpl_params_all[[max(i - 1, 0)]]
