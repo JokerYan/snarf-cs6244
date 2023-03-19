@@ -70,7 +70,7 @@ class SNARFModel(pl.LightningModule):
                 # occ_pd = masked_softmax(occ_pd, mask, dim=-1, mode='max')
                 occ_pd, max_idx = masked_softmax_with_idx(occ_pd, mask, dim=-1, mode='max')
 
-                # # test velocity
+                # test velocity
                 velocity = self.deformer.query_velocity(pts_d_split, max_idx, cond, smpl_tfs, smpl_tfs_last, eval_mode=eval_mode)
                 velocity_list.append(velocity)
             else:
@@ -82,6 +82,13 @@ class SNARFModel(pl.LightningModule):
         velocity = torch.cat(velocity_list, 1)
 
         return accum_pred
+
+    def query_velocity(self, pts_d, smpl_tfs, smpl_tfs_last, smpl_thetas):
+        batch_points = 60000
+        # split to prevent out of memory
+        for pts_d_split in torch.split(pts_d, batch_points, dim=1):
+            print(pts_d_split.shape)
+            # velocity = self.deformer.query_velocity(pts_d_split, max_idx, cond, smpl_tfs, smpl_tfs_last, eval_mode=eval_mode)
 
     def training_step(self, data, data_idx):
 
@@ -220,7 +227,7 @@ class SNARFModel(pl.LightningModule):
         mesh = generate_mesh(occ_func, smpl_verts.squeeze(0),res_up=res_up)
 
         # query velocity
-        print(mesh.vertices.shape)
+        self.query_velocity(mesh.vertices, smpl_tfs, smpl_tfs_last, smpl_thetas)
 
         if fast_mode:
             verts  = torch.tensor(mesh.vertices).type_as(smpl_verts)
