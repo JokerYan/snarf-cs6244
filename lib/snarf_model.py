@@ -71,8 +71,7 @@ class SNARFModel(pl.LightningModule):
 
                 # # test velocity
                 velocity = self.deformer.query_velocity(pts_d_split, max_idx, cond, smpl_tfs, smpl_tfs_last, eval_mode=eval_mode)
-                print(velocity)
-                exit()
+                print(torch.mean(torch.abs(velocity)))
             else:
                 occ_pd = masked_softmax(occ_pd, mask, dim=-1, mode='softmax', soft_blend=self.opt.soft_blend)
 
