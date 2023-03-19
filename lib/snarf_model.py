@@ -71,7 +71,6 @@ class SNARFModel(pl.LightningModule):
 
                 # # test velocity
                 velocity = self.deformer.query_velocity(pts_d_split, max_idx, cond, smpl_tfs, smpl_tfs_last, eval_mode=eval_mode)
-                print(torch.mean(torch.abs(velocity)))
             else:
                 occ_pd = masked_softmax(occ_pd, mask, dim=-1, mode='softmax', soft_blend=self.opt.soft_blend)
 
@@ -88,7 +87,7 @@ class SNARFModel(pl.LightningModule):
             data = self.data_processor.process(data)
 
         # BCE loss
-        occ_pd = self.forward(data['pts_d'], data['smpl_tfs'], data['smpl_thetas'], eval_mode=False)
+        occ_pd = self.forward(data['pts_d'], data['smpl_tfs'], data['smpl_tfs_last'], data['smpl_thetas'], eval_mode=False)
         loss_bce = torch.nn.functional.binary_cross_entropy_with_logits(occ_pd, data['occ_gt'])
         self.log('train_bce', loss_bce)
         loss = loss_bce
@@ -153,6 +152,7 @@ class SNARFModel(pl.LightningModule):
         with torch.no_grad():
 
             occ_pd = self.forward(data['pts_d'], data['smpl_tfs'], data['smpl_tfs_last'], data['smpl_thetas'], eval_mode=True)
+            print(occ_pd.shape)
 
             _, num_point, _ = data['occ_gt'].shape
             bbox_iou = calculate_iou(data['occ_gt'][:,:num_point//2]>0.5, occ_pd[:,:num_point//2]>0)
