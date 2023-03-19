@@ -227,7 +227,8 @@ class SNARFModel(pl.LightningModule):
         mesh = generate_mesh(occ_func, smpl_verts.squeeze(0),res_up=res_up)
 
         # query velocity
-        self.query_velocity(mesh.vertices, smpl_tfs, smpl_tfs_last, smpl_thetas)
+        vertices = torch.from_numpy(mesh.vertices).cuda()
+        self.query_velocity(vertices, smpl_tfs, smpl_tfs_last, smpl_thetas)
 
         if fast_mode:
             verts  = torch.tensor(mesh.vertices).type_as(smpl_verts)
