@@ -34,8 +34,10 @@ class DFaustDataset(Dataset):
 
     def __getitem__(self, i):
         name = self.frame_names[i]
+        name_last = self.frame_names[max(i - 1, 0)]
         data = {}
         dataset = np.load(name)
+        dataset_last = np.load(name_last)
         if self.stage == 'train':
             random_idx = torch.cat([torch.randint(0,self.total_points,[self.points_per_frame//8]), # 1//8 for bbox samples
                                    torch.randint(0,self.total_points,[self.points_per_frame])+self.total_points], # 1 for surface samples
@@ -51,9 +53,7 @@ class DFaustDataset(Dataset):
 
         data['smpl_verts'] = torch.tensor(dataset['vertices'])
         data['smpl_tfs'] = torch.tensor(dataset['bone_transforms']).inverse()
-        data['smpl_tfs_last'] = []
-        print(data['smpl_tfs'].shape)
-        exit()
+        data['smpl_tfs_last'] = torch.tensor(dataset_last['bone_transforms'].inverse())
         data['smpl_jnts'] = torch.tensor(dataset['joints'])
         data['smpl_thetas'] = torch.tensor(dataset['pose'])
         data['smpl_betas'] = self.betas

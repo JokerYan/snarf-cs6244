@@ -42,7 +42,7 @@ class SNARFModel(pl.LightningModule):
         optimizer = torch.optim.Adam(self.parameters(), lr=self.opt.optim.lr)
         return optimizer
 
-    def forward(self, pts_d, smpl_tfs, smpl_thetas, eval_mode=True):
+    def forward(self, pts_d, smpl_tfs, smpl_tfs_last, smpl_thetas, eval_mode=True):
 
         # rectify rest pose 
         smpl_tfs = torch.einsum('bnij,njk->bnik', smpl_tfs, self.smpl_server.tfs_c_inv)
@@ -70,7 +70,7 @@ class SNARFModel(pl.LightningModule):
                 occ_pd, max_idx = masked_softmax_with_idx(occ_pd, mask, dim=-1, mode='max')
 
                 # # test velocity
-                self.deformer.query_velocity(pts_d_split, max_idx, cond, smpl_tfs, smpl_tfs, eval_mode=eval_mode)
+                self.deformer.query_velocity(pts_d_split, max_idx, cond, smpl_tfs, smpl_tfs_last, eval_mode=eval_mode)
             else:
                 occ_pd = masked_softmax(occ_pd, mask, dim=-1, mode='softmax', soft_blend=self.opt.soft_blend)
 
