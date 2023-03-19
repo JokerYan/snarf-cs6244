@@ -71,6 +71,7 @@ class SNARFModel(pl.LightningModule):
 
                 # # test velocity
                 velocity = self.deformer.query_velocity(pts_d_split, max_idx, cond, smpl_tfs, smpl_tfs_last, eval_mode=eval_mode)
+                print(velocity)
             else:
                 occ_pd = masked_softmax(occ_pd, mask, dim=-1, mode='softmax', soft_blend=self.opt.soft_blend)
 
@@ -168,8 +169,10 @@ class SNARFModel(pl.LightningModule):
         res_up = np.log2(res//32)
 
         if verbose:
-            surf_pred_cano = self.extract_mesh(self.smpl_server.verts_c, data['smpl_tfs'][[0]], data['smpl_thetas'][[0]], res_up=res_up, canonical=True, with_weights=True)
-            surf_pred_def = self.extract_mesh(data['smpl_verts'][[0]], data['smpl_tfs'][[0]], data['smpl_thetas'][[0]], res_up=res_up, canonical=False, with_weights=False)
+            surf_pred_cano = self.extract_mesh(self.smpl_server.verts_c, data['smpl_tfs'][[0]], data['smpl_tfs_last'][[0]],
+                                               data['smpl_thetas'][[0]], res_up=res_up, canonical=True, with_weights=True)
+            surf_pred_def = self.extract_mesh(data['smpl_verts'][[0]], data['smpl_tfs'][[0]], data['smpl_tfs_last'][[0]],
+                                              data['smpl_thetas'][[0]], res_up=res_up, canonical=False, with_weights=False)
 
             img_pred_cano = render_trimesh(surf_pred_cano)
             img_pred_def  = render_trimesh(surf_pred_def)
@@ -187,7 +190,8 @@ class SNARFModel(pl.LightningModule):
         else:
             smpl_verts = self.smpl_server.verts_c if fast_mode else data['smpl_verts'][[0]]
 
-            surf_pred_def = self.extract_mesh(smpl_verts, data['smpl_tfs'][[0]], data['smpl_thetas'][[0]], res_up=res_up, canonical=False, with_weights=False, fast_mode=fast_mode)
+            surf_pred_def = self.extract_mesh(smpl_verts, data['smpl_tfs'][[0]], data['smpl_tfs_last'][[0]],
+                                              data['smpl_thetas'][[0]], res_up=res_up, canonical=False, with_weights=False, fast_mode=fast_mode)
                         
             img_pred_def  = render_trimesh(surf_pred_def, mode='p')
             results = {
@@ -198,7 +202,7 @@ class SNARFModel(pl.LightningModule):
 
         return results    
 
-    def extract_mesh(self, smpl_verts, smpl_tfs, smpl_thetas, canonical=False, with_weights=False, res_up=2, fast_mode=False):
+    def extract_mesh(self, smpl_verts, smpl_tfs, smpl_tfs_last, smpl_thetas, canonical=False, with_weights=False, res_up=2, fast_mode=False):
         '''
         In fast mode, we extract canonical mesh and then forward skin it to posed space.
         This is faster as it bypasses root finding.
@@ -207,7 +211,7 @@ class SNARFModel(pl.LightningModule):
         if canonical or fast_mode:
             occ_func = lambda x: self.network(x, {'smpl': smpl_thetas[:,3:]/np.pi}).reshape(-1, 1)
         else:
-            occ_func = lambda x: self.forward(x, smpl_tfs, smpl_thetas, eval_mode=True).reshape(-1, 1)
+            occ_func = lambda x: self.forward(x, smpl_tfs, smpl_tfs_last, smpl_thetas, eval_mode=True).reshape(-1, 1)
             
         mesh = generate_mesh(occ_func, smpl_verts.squeeze(0),res_up=res_up)
 
