@@ -49,7 +49,8 @@ class SNARFModel(pl.LightningModule):
 
         cond = {'smpl': smpl_thetas[:,3:]/np.pi}
         
-        batch_points = 60000
+        # batch_points = 60000
+        batch_points = 30000
 
         accum_pred = []
         velocity_list = []
