@@ -151,7 +151,7 @@ class SNARFModel(pl.LightningModule):
 
         with torch.no_grad():
 
-            occ_pd = self.forward(data['pts_d'], data['smpl_tfs'], data['smpl_thetas'], eval_mode=True)
+            occ_pd = self.forward(data['pts_d'], data['smpl_tfs'], data['smpl_tfs_last'], data['smpl_thetas'], eval_mode=True)
 
             _, num_point, _ = data['occ_gt'].shape
             bbox_iou = calculate_iou(data['occ_gt'][:,:num_point//2]>0.5, occ_pd[:,:num_point//2]>0)
